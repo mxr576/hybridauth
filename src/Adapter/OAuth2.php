@@ -411,6 +411,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
         $state = filter_input($_SERVER['REQUEST_METHOD'] === 'POST' ? INPUT_POST : INPUT_GET, 'state');
         $code = filter_input($_SERVER['REQUEST_METHOD'] === 'POST' ? INPUT_POST : INPUT_GET, 'code');
 
+        $this->logger->debug(sprintf('%s::authenticateFinish(), state: got "%s", expected "%s".', get_class($this), $state, $this->getStoredData('authorization_state')));
         /**
          * Authorization Request State
          *
@@ -479,6 +480,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
             }
 
             $this->storeData('authorization_state', $this->AuthorizeUrlParameters['state']);
+            $this->logger->debug(sprintf('%s::getAuthorizeUrl(), set "%s" state on authroziation url.', get_class($this), $this->AuthorizeUrlParameters['state']));
         }
 
         $queryParams = http_build_query($this->AuthorizeUrlParameters, '', '&', $this->AuthorizeUrlParametersEncType);
@@ -583,6 +585,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
             $this->storeData('expires_at', $expires_at);
         }
 
+        $this->logger->debug(sprintf('%s::validateAccessTokenExchange(), removing "%s" state from storage.', get_class($this), $this->getStoredData('authorization_state')));
         $this->deleteStoredData('authorization_state');
 
         $this->initialize();
